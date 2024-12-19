@@ -1,0 +1,33 @@
+with cte as
+(
+	select * 
+    from salaries 
+    where company_location in
+	(
+		select company_location 
+        from 
+		(
+			select company_location, round(avg(salary_in_usd),2) as 'avg_salary', count(distinct work_year) as 'num_years'  
+			from salaries where work_year >= (year(current_date())- 2) 
+			group by company_location 
+			having num_years = 3
+		) a 
+        where work_year >= (year(current_date())- 2) 
+	)
+)
+
+
+select company_location, 
+max(case when work_year=2024 then avg_salary end) as 'avg_salary_2024',
+max(case when work_year=2023 then avg_salary end) as 'avg_salary_2023',
+max(case when work_year=2022 then avg_salary end) as 'avg_salary_2022'
+from 
+(
+select company_location,work_year, round(avg(salary_in_usd),2) as avg_salary
+from cte
+group by company_location, work_year) b
+group by company_location 
+having 
+avg_salary_2024 > avg_salary_2023 
+and 
+avg_salary_2023 > avg_salary_2022;

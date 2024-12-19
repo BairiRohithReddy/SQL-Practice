@@ -1,0 +1,11 @@
+--create database test;
+--use test;
+--Query to rename an existing database
+--alter database test modify name = practice;
+--drop database practice;
+--cannot drop a database which currently in use we get an error which says database currently in use
+--similarly if other users are connected ot the database we need to put the db in single user mode and then drop the db
+--alter database databaseName set SINGLE_USER with Rollback immediate;
+--with immediate rollback option, it will rollback all incomplete txns and closes the connection to the db
+--systems databases cannot be dropped
+--example: drop database master;

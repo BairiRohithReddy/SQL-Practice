@@ -1,0 +1,48 @@
+WITH cte AS (
+    SELECT 
+        c.customer_id, 
+        c.name, 
+        o.order_date, 
+        o.quantity, 
+        p.price
+    FROM 
+        customer c 
+    INNER JOIN 
+        orders o ON c.customer_id = o.customer_id
+    INNER JOIN 
+        product p ON o.product_id = p.product_id
+),
+monthly_spending AS (
+    SELECT 
+        customer_id, 
+        name, 
+        EXTRACT(MONTH FROM order_date) AS order_month, 
+        SUM(quantity * price) AS total_spent
+    FROM 
+        cte
+    WHERE 
+        order_date BETWEEN '2020-06-01' AND '2020-07-31'
+    GROUP BY 
+        customer_id, name, EXTRACT(MONTH FROM order_date)
+), 
+qualified_customers AS (
+    SELECT 
+        customer_id, 
+        name,
+        order_month
+    FROM 
+        monthly_spending
+    WHERE 
+        (order_month = 6 AND total_spent >= 100)
+        OR
+        (order_month = 7 AND total_spent >= 100)
+)
+SELECT 
+    customer_id, 
+    name
+FROM 
+    qualified_customers
+GROUP BY 
+    customer_id, name
+HAVING 
+    COUNT(DISTINCT order_month) = 2;
