@@ -1,0 +1,3 @@
+SELECT Name, Class
+FROM STUDENTS
+WHERE Age > 15;
